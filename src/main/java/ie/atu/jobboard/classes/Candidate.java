@@ -87,4 +87,5 @@ public class Candidate {
         ", age='" + age + '\'' +
         '}';
   }
+
 }
