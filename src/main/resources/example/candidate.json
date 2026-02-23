@@ -1,0 +1,92 @@
+[
+  {
+    "name": "John Murphy",
+    "email": "john.murphy@gmail.com",
+    "phone": "0871234567",
+    "experience": "2 years retail assistant at Dunnes Stores",
+    "skills": "Customer service, POS system, teamwork",
+    "location": "Galway",
+    "age": "22"
+  },
+  {
+    "name": "Emma O'Brien",
+    "email": "emma.obrien@gmail.com",
+    "phone": "0862345678",
+    "experience": "1 year barista at local café",
+    "skills": "Coffee making, communication, cash handling",
+    "location": "Dublin",
+    "age": "21"
+  },
+  {
+    "name": "Liam Kelly",
+    "email": "liam.kelly@gmail.com",
+    "phone": "0853456789",
+    "experience": "3 years warehouse operative",
+    "skills": "Inventory management, forklift license, logistics",
+    "location": "Limerick",
+    "age": "28"
+  },
+  {
+    "name": "Sophia Chen",
+    "email": "sophia.chen@gmail.com",
+    "phone": "0894567890",
+    "experience": "Software engineering intern",
+    "skills": "Java, Spring Boot, MySQL, REST APIs",
+    "location": "Cork",
+    "age": "23"
+  },
+  {
+    "name": "Daniel Walsh",
+    "email": "daniel.walsh@gmail.com",
+    "phone": "0835678901",
+    "experience": "Sales assistant at clothing store",
+    "skills": "Sales, upselling, customer engagement",
+    "location": "Galway",
+    "age": "24"
+  },
+  {
+    "name": "Aisha Khan",
+    "email": "aisha.khan@gmail.com",
+    "phone": "0876789012",
+    "experience": "Call centre agent",
+    "skills": "Communication, CRM systems, problem solving",
+    "location": "Waterford",
+    "age": "26"
+  },
+  {
+    "name": "Mark O'Sullivan",
+    "email": "mark.osullivan@gmail.com",
+    "phone": "0867890123",
+    "experience": "IT support technician",
+    "skills": "Networking, troubleshooting, Windows/Linux",
+    "location": "Dublin",
+    "age": "27"
+  },
+  {
+    "name": "Chloe Byrne",
+    "email": "chloe.byrne@gmail.com",
+    "phone": "0858901234",
+    "experience": "Hotel receptionist",
+    "skills": "Customer service, booking systems, multitasking",
+    "location": "Kilkenny",
+    "age": "25"
+  },
+  {
+    "name": "Ryan Lim",
+    "email": "ryan.lim@gmail.com",
+    "phone": "0899012345",
+    "experience": "Frontend developer intern",
+    "skills": "HTML, CSS, JavaScript, React",
+    "location": "Galway",
+    "age": "22"
+  },
+  {
+    "name": "Hannah Doyle",
+    "email": "hannah.doyle@gmail.com",
+    "phone": "0830123456",
+    "experience": "Healthcare assistant",
+    "skills": "Patient care, teamwork, time management",
+    "location": "Sligo",
+    "age": "29"
+  }
+]

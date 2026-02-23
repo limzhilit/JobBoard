@@ -1,4 +1,4 @@
-package ie.atu.jobboard.classes;
+package ie.atu.jobboard.model;
 
 import java.util.ArrayList;
 import java.util.Scanner;

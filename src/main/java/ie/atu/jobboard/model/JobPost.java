@@ -1,4 +1,4 @@
-package ie.atu.jobboard.classes;
+package ie.atu.jobboard.model;
 
 public class JobPost{
     private int jobId;

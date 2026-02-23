@@ -1,14 +1,17 @@
 package ie.atu.jobboard.controller;
 
+import ie.atu.jobboard.model.Candidate;
 import ie.atu.jobboard.services.CandidateService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 
 @RestController
-@RequestMapping("/candidate")
+@RequestMapping("/candidates")
 public class CandidateController {
   private final CandidateService candidateService;
 
@@ -16,10 +19,15 @@ public class CandidateController {
     this.candidateService = candidateService;
   }
 
-  @GetMapping("/add")
-  public ResponseEntity<Integer> add(@RequestParam int a, @RequestParam int b) {
-    return ResponseEntity.ok(candidateService.add(a, b));
+  @PostMapping
+  public ResponseEntity<Candidate> addCandidate(
+      @Valid @RequestBody Candidate candidate) {
+    Candidate saved = candidateService.addCandidate(candidate);
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 
+  @GetMapping
+  public ResponseEntity<List<Candidate>> getAllCandidates() {
+    return ResponseEntity.ok(candidateService.getAllCandidates());
+  }
 }
-
