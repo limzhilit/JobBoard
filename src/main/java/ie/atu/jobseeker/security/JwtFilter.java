@@ -31,7 +31,8 @@ public class JwtFilter extends OncePerRequestFilter {
     String path = request.getRequestURI();
     System.out.println("Path: " + path);
     // Skip H2 console in dev
-    if (path.startsWith("/h2-console")) {
+    String servletPath = request.getServletPath();
+    if (servletPath != null && servletPath.startsWith("/h2-console")) {
       filterChain.doFilter(request, response);
       return;
     }
