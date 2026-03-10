@@ -18,4 +18,11 @@ public class JobseekerController {
     System.out.println("Received jobseeker data: " + jobseeker);
     return ResponseEntity.ok(jobseekerService.upsertJobseeker(token, jobseeker));
   }
+
+  @GetMapping("/getJobseeker")
+  public ResponseEntity<?> getJobseeker(@RequestHeader("Authorization") String token) {
+    return ResponseEntity.ok(jobseekerService.getJobseeker(token));
+  }
+
+
 }

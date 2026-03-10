@@ -21,15 +21,15 @@ public class ExperienceService {
   private final ExperienceRepository experienceRepository;
 
   public List<Experience> getAll(@RequestHeader("Authorization") String token) {
-    String userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(Long.valueOf(userId))
+    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
+    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("Profile not found"));
     return jobseeker.getExperiences();
   }
 
   public Experience add(String token, Experience experience) {
-    String userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(Long.valueOf(userId))
+    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
+    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("Profile not found"));
     experience.setJobseeker(jobseeker);
     jobseeker.getExperiences().add(experience);
@@ -38,8 +38,8 @@ public class ExperienceService {
   }
 
   public Experience update(String token, Long id, Experience experience) {
-    String userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(Long.valueOf(userId))
+    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
+    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("Profile not found"));
 
     Experience existing = jobseeker.getExperiences().stream()
@@ -52,8 +52,8 @@ public class ExperienceService {
   }
 
   public void delete(String token, Long id) {
-    String userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(Long.valueOf(userId))
+    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
+    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("Profile not found"));
 
     Experience existing = jobseeker.getExperiences().stream()
@@ -63,6 +63,26 @@ public class ExperienceService {
 
     jobseeker.getExperiences().remove(existing);
     jobseekerRepository.save(jobseeker); // orphanRemoval=true will delete it
+  }
+
+  public List<Experience> saveAll(String token, List<Experience> experiences) {
+    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
+    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
+        .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+    // Clear existing effectively
+    jobseeker.getExperiences().clear();
+    
+    // Link new ones
+    for (Experience exp : experiences) {
+      exp.setJobseeker(jobseeker);
+      // Ensure nested objects don't have IDs if we want to treat them as new potentially
+      // or just trust Hibernate if they are already mapped correctly
+      jobseeker.getExperiences().add(exp);
+    }
+
+    jobseekerRepository.save(jobseeker);
+    return jobseeker.getExperiences();
   }
 
 

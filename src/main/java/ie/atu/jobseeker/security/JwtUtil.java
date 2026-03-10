@@ -1,6 +1,7 @@
 package ie.atu.jobseeker.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,19 +28,34 @@ public class JwtUtil {
     Parses Claims: .parseSignedClaims(token) breaks the string into its original components (Header, Payload, Signature).
     Extracts Payload: .getPayload() returns the Claims object, which contains the user's data (email, roles, expiration date).
    */
+
+  // Validate token, return Claims, or null if invalid
   public Claims validateToken(String token) {
-    return Jwts.parser()
-        .verifyWith(getSigningKey())
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
+    try {
+      return Jwts.parser()
+          .verifyWith(getSigningKey())
+          .build()
+          .parseSignedClaims(token)
+          .getPayload();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims(); // expired → still return claims for refresh
+    } catch (JwtException | IllegalArgumentException e) {
+      return null; // invalid token
+    }
   }
 
-  public String extractUserId(String token) {
+  // Extract userId safely
+  public Long extractUserId(String token) {
+    Claims claims = validateToken(token);
+    if (claims == null) return null;
+
+    String sub = claims.getSubject();
+    if (sub == null || sub.isEmpty()) return null;
+
     try {
-      return validateToken(token).getSubject();
-    } catch (JwtException | IllegalArgumentException e) {
-      return null;
+      return Long.parseLong(sub);
+    } catch (NumberFormatException e) {
+      return null; // prevent crash
     }
   }
 

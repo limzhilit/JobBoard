@@ -14,8 +14,7 @@ public class JobseekerService {
   private final JwtUtil jwtUtil;
 
   public Jobseeker upsertJobseeker(String token, Jobseeker incoming) {
-    String jwt = token.replace("Bearer ", "");
-    Long userId = Long.parseLong(jwtUtil.extractUserId(jwt));
+    long userId = jwtUtil.extractUserId(token.replace("Bearer ", ""));
     incoming.setUserId(userId);
 
     return jobseekerRepo.findByUserId(userId)
@@ -24,11 +23,19 @@ public class JobseekerService {
           existing.setGender(incoming.getGender());
           existing.setEthnicity(incoming.getEthnicity());
           existing.setLocation(incoming.getLocation());
-          existing.setDateOfBirth(incoming.getDateOfBirth());
+          existing.setDob(incoming.getDob());
           existing.getPhone().setCountryCode(incoming.getPhone().getCountryCode());
           existing.getPhone().setNumber(incoming.getPhone().getNumber());
+          existing.setLinks(incoming.getLinks());
           return jobseekerRepo.save(existing); // UPDATE
         })
         .orElseGet(() -> jobseekerRepo.save(incoming)); // INSERT
+  }
+
+  public Jobseeker getJobseeker(String token) {
+    String jwt = token.replace("Bearer ", "");
+    long userId = jwtUtil.extractUserId(jwt);
+    return jobseekerRepo.findByUserId(userId)
+        .orElseThrow(() -> new RuntimeException("Jobseeker profile not found for user: " + userId));
   }
 }

@@ -2,11 +2,11 @@ package ie.atu.jobseeker.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import jakarta.validation.constraints.*;
 
@@ -18,6 +18,7 @@ import jakarta.validation.constraints.*;
     uniqueConstraints = @UniqueConstraint(name = "uk_jobseeker_user_id", columnNames = "user_id")
 )
 @Entity
+@RequiredArgsConstructor
 public class Jobseeker {
 
   @Id
@@ -29,7 +30,7 @@ public class Jobseeker {
 
   private String name;
 
-  private Date dateOfBirth;
+  private LocalDate dob;
 
   private String gender;
 
@@ -44,7 +45,6 @@ public class Jobseeker {
   @ElementCollection
   @CollectionTable(name = "jobseeker_links", joinColumns = @JoinColumn(name = "jobseeker_id"))
   @Column(name = "link")
-  @Size(max = 5, message = "You can add at most 5 links")
   @Size(max = 5, message = "You can add at most 5 links")
   private List< @Size(max = 200, message = "Link must be at most 200 characters") String> links;
 
