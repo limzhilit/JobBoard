@@ -1,5 +1,6 @@
 package ie.atu.jobseeker.security;
 
+import ie.atu.jobseeker.client.AuthServiceClient;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -22,6 +23,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
   private final JwtUtil jwtUtil;
+  private final AuthServiceClient authServiceClient;
 
   @Override
   protected void doFilterInternal(
