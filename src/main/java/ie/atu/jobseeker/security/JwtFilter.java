@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -63,32 +65,48 @@ public class JwtFilter extends OncePerRequestFilter {
       setAuthentication(claims, request);
 
     } catch (ExpiredJwtException ex) {
-      // ✅ Attempt refresh HERE in the filter
-      String refreshToken = request.getHeader("Refresh-Token");
-      if (refreshToken != null) {
+      System.out.println("Token expired - attempting refresh");
+      Cookie[] cookies = request.getCookies();
+      String refreshToken = null;
+      if (cookies != null) {
+        for (Cookie cookie : cookies) {
+          if ("refreshToken".equals(cookie.getName())) {
+            refreshToken = cookie.getValue();
+            break;
+          }
+        }
+      }
+
+      if (refreshToken == null) {
+        System.out.println("No refresh token found");
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("Token expired, no refresh token");
+        return; // ✅ stop here
+      } else {
         try {
-          String newAccessToken = authServiceClient.refresh(refreshToken);
+          Map<String, String> tokens = authServiceClient.refresh(refreshToken);
+          String newAccessToken = tokens.get("accessToken");
           response.setHeader("Authorization", "Bearer " + newAccessToken);
           Claims claims = jwtUtil.validateToken(newAccessToken);
           setAuthentication(claims, request);
         } catch (Exception refreshEx) {
-          SecurityContextHolder.clearContext(); // refresh failed → entrypoint handles it
+          logger.warn("Refresh failed", refreshEx);
+          SecurityContextHolder.clearContext();
         }
-      } else {
-        SecurityContextHolder.clearContext(); // no refresh token → entrypoint handles it
       }
-
     } catch (Exception ex) {
-      logger.warn("JWT validation failed", ex);
+      System.out.println("Token failed - returning 401");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write("Invalid token");
+      return;
     }
-
     filterChain.doFilter(request, response);
   }
 
   private void setAuthentication(Claims claims, HttpServletRequest request) {
     String userId = claims.getSubject();
 
-    // ✅ "role" is a String, not a List
     String role = claims.get("role", String.class);
     List<SimpleGrantedAuthority> authorities = role != null
         ? List.of(new SimpleGrantedAuthority("ROLE_" + role))

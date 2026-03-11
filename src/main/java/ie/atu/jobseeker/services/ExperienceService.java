@@ -1,89 +1,77 @@
 package ie.atu.jobseeker.services;
 
-import ie.atu.jobseeker.model.Jobseeker;
 import ie.atu.jobseeker.repository.ExperienceRepository;
 import ie.atu.jobseeker.security.JwtUtil;
 import ie.atu.jobseeker.model.Experience;
-import ie.atu.jobseeker.repository.JobseekerRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ExperienceService {
+public class ExperienceService extends BaseService{
 
-  private final JwtUtil jwtService;
-  private final JobseekerRepository jobseekerRepository;
+  private final JwtUtil jwtUtil;
   private final ExperienceRepository experienceRepository;
 
-  public List<Experience> getAll(@RequestHeader("Authorization") String token) {
-    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException("Profile not found"));
-    return jobseeker.getExperiences();
-  }
-
+  @Transactional
   public Experience add(String token, Experience experience) {
-    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException("Profile not found"));
-    experience.setJobseeker(jobseeker);
-    jobseeker.getExperiences().add(experience);
-    jobseekerRepository.save(jobseeker);
-    return experience;
+    Long userId = getCurrentUserId();
+    System.out.println("Extracted userId: " + userId);
+
+    experience.setUserId(userId);
+    experience.setId(null); // Ensure it's a new record
+    return experienceRepository.save(experience);
   }
 
+  @Transactional
   public Experience update(String token, Long id, Experience experience) {
-    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException("Profile not found"));
+    Long userId = getCurrentUserId();
 
-    Experience existing = jobseeker.getExperiences().stream()
-        .filter(e -> e.getId().equals(id))
-        .findFirst()
-        .orElseThrow(() -> new RuntimeException("Experience not found"));
+    // Verify the experience exists and belongs to this user
+    Experience existing = experienceRepository.findByIdAndUserId(id, userId)
+        .orElseThrow(() -> new RuntimeException("Experience not found or access denied"));
 
-    BeanUtils.copyProperties(experience, existing, "id", "jobseeker");
+    // Copy properties but preserve id and userId
+    BeanUtils.copyProperties(experience, existing, "id", "userId");
+
     return experienceRepository.save(existing);
   }
 
+  @Transactional
   public void delete(String token, Long id) {
-    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException("Profile not found"));
+    Long userId = getCurrentUserId();
 
-    Experience existing = jobseeker.getExperiences().stream()
-        .filter(e -> e.getId().equals(id))
-        .findFirst()
-        .orElseThrow(() -> new RuntimeException("Experience not found"));
+    // Verify ownership before deleting
+    Experience existing = experienceRepository.findByIdAndUserId(id, userId)
+        .orElseThrow(() -> new RuntimeException("Experience not found or access denied"));
 
-    jobseeker.getExperiences().remove(existing);
-    jobseekerRepository.save(jobseeker); // orphanRemoval=true will delete it
+    experienceRepository.delete(existing);
   }
 
+  @Transactional
   public List<Experience> saveAll(String token, List<Experience> experiences) {
-    long userId = jwtService.extractUserId(token.replace("Bearer ", ""));
-    Jobseeker jobseeker = jobseekerRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException("Profile not found"));
+    Long userId = getCurrentUserId();
 
-    // Clear existing effectively
-    jobseeker.getExperiences().clear();
-    
-    // Link new ones
-    for (Experience exp : experiences) {
-      exp.setJobseeker(jobseeker);
-      // Ensure nested objects don't have IDs if we want to treat them as new potentially
-      // or just trust Hibernate if they are already mapped correctly
-      jobseeker.getExperiences().add(exp);
-    }
+    // Delete all existing experiences for this user
+    experienceRepository.deleteByUserId(userId);
 
-    jobseekerRepository.save(jobseeker);
-    return jobseeker.getExperiences();
+    // Set userId for all new experiences
+    experiences.forEach(exp -> {
+      exp.setId(null); // Ensure new records
+      exp.setUserId(userId);
+    });
+
+    // Save all new experiences
+    return experienceRepository.saveAll(experiences);
   }
 
-
+  @Transactional
+  public List<Experience> getAll(String token) {
+    Long userId = getCurrentUserId();
+    return experienceRepository.findByUserId(userId);
+  }
 }

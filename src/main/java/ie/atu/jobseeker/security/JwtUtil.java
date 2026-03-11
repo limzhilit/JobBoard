@@ -1,8 +1,6 @@
 package ie.atu.jobseeker.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
@@ -31,17 +29,12 @@ public class JwtUtil {
 
   // Validate token, return Claims, or null if invalid
   public Claims validateToken(String token) {
-    try {
+    token = token.replace("Bearer ", "").trim();
       return Jwts.parser()
           .verifyWith(getSigningKey())
           .build()
           .parseSignedClaims(token)
           .getPayload();
-    } catch (ExpiredJwtException e) {
-      return e.getClaims(); // expired → still return claims for refresh
-    } catch (JwtException | IllegalArgumentException e) {
-      return null; // invalid token
-    }
   }
 
   // Extract userId safely
@@ -50,6 +43,7 @@ public class JwtUtil {
     if (claims == null) return null;
 
     String sub = claims.getSubject();
+    System.out.println("sub: " + sub);
     if (sub == null || sub.isEmpty()) return null;
 
     try {

@@ -1,8 +1,12 @@
 package ie.atu.jobseeker.client;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import java.util.Map;
 
 @Component
 public class AuthServiceClient {
@@ -15,11 +19,12 @@ public class AuthServiceClient {
         .build();
   }
 
-  public String refresh(String refreshToken) {
+  public Map<String, String> refresh(String refreshToken) {
     return restClient.post()
         .uri("/auth/refresh")
-        .header("Refresh-Token", refreshToken)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(Map.of("refreshToken", refreshToken)) // ✅ matches @CookieValue or @RequestBody on auth service
         .retrieve()
-        .body(String.class);
+        .body(new ParameterizedTypeReference<Map<String, String>>() {});
   }
 }

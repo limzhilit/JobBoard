@@ -1,6 +1,5 @@
 package ie.atu.jobseeker.services;
 
-import ie.atu.jobseeker.security.JwtUtil;
 import ie.atu.jobseeker.model.Jobseeker;
 import ie.atu.jobseeker.repository.JobseekerRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,13 +7,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class JobseekerService {
+public class JobseekerService extends BaseService {
 
   private final JobseekerRepository jobseekerRepo;
-  private final JwtUtil jwtUtil;
 
   public Jobseeker upsertJobseeker(String token, Jobseeker incoming) {
-    long userId = jwtUtil.extractUserId(token.replace("Bearer ", ""));
+    Long userId = getCurrentUserId();
     incoming.setUserId(userId);
 
     return jobseekerRepo.findByUserId(userId)
@@ -33,8 +31,7 @@ public class JobseekerService {
   }
 
   public Jobseeker getJobseeker(String token) {
-    String jwt = token.replace("Bearer ", "");
-    long userId = jwtUtil.extractUserId(jwt);
+    Long userId = getCurrentUserId();
     return jobseekerRepo.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("Jobseeker profile not found for user: " + userId));
   }

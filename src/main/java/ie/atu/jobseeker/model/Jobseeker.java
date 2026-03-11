@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+
 import jakarta.validation.constraints.*;
 
 
@@ -42,13 +44,19 @@ public class Jobseeker {
   @Embedded
   private Phone phone;
 
-  @ElementCollection
-  @CollectionTable(name = "jobseeker_links", joinColumns = @JoinColumn(name = "jobseeker_id"))
-  @Column(name = "link")
-  @Size(max = 5, message = "You can add at most 5 links")
-  private List< @Size(max = 200, message = "Link must be at most 200 characters") String> links;
 
-  @OneToMany(mappedBy = "jobseeker", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Size(max = 20, message = "You can add at most 20 experiences")
-  private List<@Valid Experience> experiences; // ensures nested validation in Experience class
+
+  @ElementCollection
+  @CollectionTable(
+      name = "jobseeker_links",
+      joinColumns = @JoinColumn(name = "jobseeker_id")
+  )
+  @MapKeyColumn(name = "label")
+  @Column(name = "url")
+  @Size(max = 5, message = "You can add at most 5 links")
+  private Map<
+        @Size(max = 50, message = "Link name must be at most 50 characters") String,
+        @Size(max = 200, message = "URL must be at most 200 characters") String
+        > links;
+
 }

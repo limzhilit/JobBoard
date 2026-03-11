@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/jobseeker/experience")
+@RequestMapping("/jobseeker/experience")
 @RequiredArgsConstructor
 public class ExperienceController {
 
