@@ -1,7 +1,6 @@
 package ie.atu.jobseeker.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
@@ -32,4 +31,8 @@ public class Project {
 
   @PositiveOrZero(message = "Project value cannot be negative")
   private Integer projectValue;
+
+  @ManyToOne
+  @JoinColumn(name = "position_id")
+  private Position position;
 }
