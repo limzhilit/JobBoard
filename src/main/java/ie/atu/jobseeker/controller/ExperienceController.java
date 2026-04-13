@@ -1,5 +1,6 @@
 package ie.atu.jobseeker.controller;
 
+import ie.atu.jobseeker.dto.ExperienceUpdateDTO;
 import ie.atu.jobseeker.model.Experience;
 import ie.atu.jobseeker.services.ExperienceService;
 import lombok.RequiredArgsConstructor;
@@ -19,24 +20,27 @@ public class ExperienceController {
     return ResponseEntity.ok(experienceService.getAll(token));
   }
 
-  @PostMapping
-  public ResponseEntity<?> add(@RequestHeader("Authorization") String token, @RequestBody Experience experience) {
-    return ResponseEntity.ok(experienceService.add(token, experience));
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getAllById(@PathVariable Long id) {
+    return ResponseEntity.ok(experienceService.getAllById(id));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> update(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody Experience experience) {
-    return ResponseEntity.ok(experienceService.update(token, id, experience));
+  public ResponseEntity<?> upsert(
+      @PathVariable Long id,
+      @RequestBody ExperienceUpdateDTO experience
+  ) {
+    return ResponseEntity.ok(experienceService.upsert(id, experience));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> delete(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-    experienceService.delete(token, id);
+  public ResponseEntity<?> delete( @PathVariable Long id) {
+    experienceService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
   @PutMapping("/bulk")
-  public ResponseEntity<?> bulkSave(@RequestHeader("Authorization") String token, @RequestBody List<Experience> experiences) {
-    return ResponseEntity.ok(experienceService.saveAll(token, experiences));
+  public ResponseEntity<?> bulkSave(@RequestBody List<Experience> experiences) {
+    return ResponseEntity.ok(experienceService.saveAll( experiences));
   }
 }
