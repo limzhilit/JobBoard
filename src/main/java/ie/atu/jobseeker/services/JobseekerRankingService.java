@@ -75,6 +75,10 @@ public class JobseekerRankingService {
 
     String text = js.getSearchableText();
 
+    if (text == null) {
+      return 0; // nothing to match
+    }
+
     for (String keyword : keywords) {
       if (text.contains(keyword.toLowerCase())) {
         score++;
