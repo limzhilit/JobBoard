@@ -1,5 +1,6 @@
 package ie.atu.jobseeker.controller;
 
+import ie.atu.jobseeker.model.JobSearch;
 import ie.atu.jobseeker.model.Jobseeker;
 import ie.atu.jobseeker.services.JobseekerService;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,14 @@ public class JobseekerController {
     return ResponseEntity.ok(jobseekerService.getJobseeker(token));
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getJobseekerById(@PathVariable Long id) {
+    return ResponseEntity.ok(jobseekerService.getJobseekerById(id));
+  }
+
+  @PostMapping("/search")
+  public ResponseEntity<?> searchJobseeker(@RequestBody JobSearch jobSearch) {
+    return ResponseEntity.ok(jobseekerService.searchJobseekers(jobSearch));
+  }
 
 }

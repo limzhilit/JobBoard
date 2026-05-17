@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.constraints.*;
+import lombok.ToString;
 
 
 @Getter
@@ -21,6 +21,7 @@ import jakarta.validation.constraints.*;
 )
 @Entity
 @RequiredArgsConstructor
+@ToString
 public class Jobseeker {
 
   @Id
@@ -34,7 +35,8 @@ public class Jobseeker {
 
   private LocalDate dob;
 
-  private String gender;
+  @Enumerated(EnumType.STRING)
+  private Gender gender;
 
   private String ethnicity;
 
@@ -43,8 +45,6 @@ public class Jobseeker {
   @Valid
   @Embedded
   private Phone phone;
-
-
 
   @ElementCollection
   @CollectionTable(
@@ -58,5 +58,10 @@ public class Jobseeker {
         @Size(max = 50, message = "Link name must be at most 50 characters") String,
         @Size(max = 200, message = "URL must be at most 200 characters") String
         > links;
+
+  private String searchableText;
+
+  private Integer expectedSalary;
+
 
 }

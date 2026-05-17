@@ -1,5 +1,6 @@
 package ie.atu.jobseeker.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,5 +23,14 @@ public class GlobalExceptionHandler {
       errors.put(fieldName, errorMessage);
     }
     return ResponseEntity.badRequest().body(errors);
+  }
+
+  @ExceptionHandler(JobseekerNotFoundException.class)
+  public ResponseEntity<?> handle(JobseekerNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of(
+            "code", "PROFILE_NOT_FOUND",
+            "message", ex.getMessage()
+        ));
   }
 }
